@@ -1,70 +1,54 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
-int a[500000];
+int count, w[10], d, x[10];
 
-void merge(int low, int mid, int high);
-void merge_sort(int low, int high) {
-    int mid;
-    if (low < high) {
-        mid = (low + high) / 2;
-        merge_sort(low, mid);
-        merge_sort(mid + 1, high);
-        merge(low, mid, high);
+void subset(int cs, int k, int r)
+{
+    int i;
+    x[k] = 1;
+    if (cs + w[k] == d)
+    {
+        printf("\nSubset solution %d\n", ++count);
+        for (i = 0; i <= k; i++)
+        {
+            if (x[i] == 1)
+                printf("%d\n", w[i]);
+        }
+    }
+    else if (cs + w[k] + w[k + 1] <= d && k + 1 < 10) 
+    {
+        subset(cs + w[k], k + 1, r - w[k]);
+    }
+    if (cs + r - w[k] >= d && cs + w[k + 1] <= d && k + 1 < 10) 
+    {
+        x[k] = 0;
+        subset(cs, k + 1, r - w[k]);
     }
 }
 
-void merge(int low, int mid, int high) {
-    int h, i, j, b[500000], k;
-    h = low;
-    i = low;
-    j = mid + 1;
-    while ((h <= mid) && (j <= high)) {
-        if (a[h] <= a[j]) {
-            b[i] = a[h];
-            h++;
-        } else {
-            b[i] = a[j];
-            j++;
-        }
-        i++;
-    }
-    if (h > mid) {
-        for (k = j; k <= high; k++) {
-            b[i] = a[k];
-            i++;
-        }
-    } else {
-        for (k = h; k <= mid; k++) {
-            b[i] = a[k];
-            i++;
-        }
-    }
-    for (k = low; k <= high; k++) {
-        a[k] = b[k];
-    }
-}
-
-int main() {
-    int n, i;
-    double clk;
-    clock_t starttime, endtime;
-    printf("MERGE SORT\n");
-    printf("Enter the number of employee records:\n ");
+int main()
+{
+    int sum = 0, i, n;
+    printf("Enter the number of elements\n");
     scanf("%d", &n);
-    for (i = 0; i < n; i++) {
-        a[i] = rand() % 100;
-        printf("The Employee IDs are: \t%d\n", a[i]);
+    printf("Enter the elements in ascending order\n");
+    for (i = 0; i < n; i++)
+        scanf("%d", &w[i]);
+    printf("Enter the required sum\n");
+    scanf("%d", &d);
+    for (i = 0; i < n; i++)
+        sum += w[i];
+    if (sum < d)
+    {
+        printf("No solution exists\n");
+        return 0; 
     }
-    starttime = clock();
-    merge_sort(0, n - 1);
-    endtime = clock();
-    clk = (double)(endtime - starttime) / CLOCKS_PER_SEC;
-    printf("\nEmployee IDs in sorted order:\n");
-    for (i = 0; i < n; i++) {
-        printf("\t%d\n", a[i]);
+    printf("The solution is\n");
+    count = 0;
+    subset(0, 0, sum);
+    if (count == 0)
+    {
+        printf("No solution exists\n"); 
     }
-    printf("\nThe run time is %f\n", clk);
     return 0;
 }
